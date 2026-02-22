@@ -6,7 +6,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PollController;
 
 Route::get('/', function () {
-    return view('dashboard');
+    return view('home');
 })->middleware('auth');
 
 Auth::routes();

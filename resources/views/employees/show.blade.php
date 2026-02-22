@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $employee->name }} — Employee Profile</title>
+    <title>{{ $employee->FirstName }} {{ $employee->LastName }} — Employee Profile</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
@@ -220,9 +220,7 @@
             border: 1px solid rgba(248, 113, 113, 0.25);
         }
 
-        .btn-danger:hover {
-            background: rgba(248, 113, 113, 0.1);
-        }
+        .btn-danger:hover { background: rgba(248, 113, 113, 0.1); }
     </style>
 </head>
 <body>
@@ -237,12 +235,15 @@
         <div class="profile-body">
             <div class="avatar-wrap">
                 <div class="avatar">
-                    {{ strtoupper(substr($employee->name, 0, 1)) }}
+                    {{ strtoupper(substr($employee->FirstName, 0, 1)) }}
                 </div>
             </div>
 
-            <div class="profile-name">{{ $employee->name }}</div>
-            <div class="profile-role">{{ $employee->position ?? 'No position assigned' }}</div>
+            <div class="profile-name">
+                {{ $employee->LastName }}, {{ $employee->FirstName }}
+                {{ $employee->NameExtension ?? '' }}
+            </div>
+            <div class="profile-role">{{ $employee->CivilStatus }}</div>
             <div class="status-badge">Active</div>
 
             <hr class="divider">
@@ -255,31 +256,37 @@
                     <div class="value">{{ $employee->id }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="label">Email</div>
-                    <div class="value">{{ $employee->email ?? '—' }}</div>
+                    <div class="label">First Name</div>
+                    <div class="value">{{ $employee->FirstName }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="label">Department</div>
-                    <div class="value {{ empty($employee->department) ? 'empty' : '' }}">
-                        {{ $employee->department ?? 'Not assigned' }}
+                    <div class="label">Last Name</div>
+                    <div class="value">{{ $employee->LastName }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Middle Name</div>
+                    <div class="value {{ empty($employee->MiddleName) ? 'empty' : '' }}">
+                        {{ $employee->MiddleName ?? 'N/A' }}
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="label">Position</div>
-                    <div class="value {{ empty($employee->position) ? 'empty' : '' }}">
-                        {{ $employee->position ?? 'Not assigned' }}
+                    <div class="label">Name Extension</div>
+                    <div class="value {{ empty($employee->NameExtension) ? 'empty' : '' }}">
+                        {{ $employee->NameExtension ?? 'N/A' }}
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="label">Phone</div>
-                    <div class="value {{ empty($employee->phone) ? 'empty' : '' }}">
-                        {{ $employee->phone ?? 'Not provided' }}
-                    </div>
+                    <div class="label">Date of Birth</div>
+                    <div class="value">{{ \Carbon\Carbon::parse($employee->DateOfBirth)->format('M d, Y') }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="label">Date Hired</div>
-                    <div class="value {{ empty($employee->created_at) ? 'empty' : '' }}">
-                        {{ $employee->created_at ? $employee->created_at->format('M d, Y') : '—' }}
+                    <div class="label">Civil Status</div>
+                    <div class="value">{{ $employee->CivilStatus }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Date Added</div>
+                    <div class="value">
+                        {{ $employee->created_at ? \Carbon\Carbon::parse($employee->created_at)->format('M d, Y') : '—' }}
                     </div>
                 </div>
             </div>
@@ -291,8 +298,9 @@
                 <a href="{{ route('employees.index') }}" class="btn btn-outline">
                     Back to List
                 </a>
-                <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="margin-left: auto;"
-                    onsubmit="return confirm('Are you sure you want to delete this employee?')">
+                <form action="{{ route('employees.destroy', $employee->id) }}" method="POST"
+                      style="margin-left: auto;"
+                      onsubmit="return confirm('Are you sure you want to delete this employee?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>

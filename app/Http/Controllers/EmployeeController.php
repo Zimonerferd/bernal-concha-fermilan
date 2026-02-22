@@ -7,60 +7,67 @@ use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $data = Employees::all();
-        return view ('employees.index', ['employees'=> $data]);
+        $employees = Employees::paginate(15);
+        return view('employees.index', compact('employees'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('employees.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        
+        $validated = $request->validate([
+            'FirstName'     => 'required|string|max:30',
+            'LastName'      => 'required|string|max:30',
+            'MiddleName'    => 'nullable|string|max:30',
+            'NameExtension' => 'nullable|string|max:30',
+            'DateOfBirth'   => 'required|date',
+            'CivilStatus'   => 'required|in:Single,Married,Widowed,Separated',
+        ]);
+
+        $validated['created_by'] = auth()->id() ?? 0;
+        $validated['updated_by'] = auth()->id() ?? 0;
+
+        Employees::create($validated);
+
+        return redirect()->route('employees.index')->with('success', 'Employee added successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Employees $employees)
+    public function show(Employees $employee)
     {
-        return view('employees.show', ['employees' => $employee]);
+        return view('employees.show', compact('employee'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Employees $employees)
+    public function edit(Employees $employee)
     {
-        //
+        return view('employees.edit', compact('employee'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Employees $employees)
+    public function update(Request $request, Employees $employee)
     {
-        //
+        $validated = $request->validate([
+            'FirstName'     => 'required|string|max:30',
+            'LastName'      => 'required|string|max:30',
+            'MiddleName'    => 'nullable|string|max:30',
+            'NameExtension' => 'nullable|string|max:30',
+            'DateOfBirth'   => 'required|date',
+            'CivilStatus'   => 'required|in:Single,Married,Widowed,Separated',
+        ]);
+
+        $validated['updated_by'] = auth()->id() ?? 0;
+
+        $employee->update($validated);
+
+        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Employees $employees)
+    public function destroy(Employees $employee)
     {
-        //
+        $employee->delete();
+        return redirect()->route('employees.index')->with('success', 'Employee deleted.');
     }
 }

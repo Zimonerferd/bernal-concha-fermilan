@@ -44,9 +44,7 @@
             letter-spacing: -0.03em;
         }
 
-        .page-title span {
-            color: var(--accent);
-        }
+        .page-title span { color: var(--accent); }
 
         .badge {
             background: var(--accent-glow);
@@ -98,9 +96,7 @@
             border-collapse: collapse;
         }
 
-        thead {
-            background: rgba(124, 106, 247, 0.06);
-        }
+        thead { background: rgba(124, 106, 247, 0.06); }
 
         thead th {
             padding: 1rem 1.25rem;
@@ -120,10 +116,7 @@
         }
 
         tbody tr:last-child { border-bottom: none; }
-
-        tbody tr:hover {
-            background: rgba(124, 106, 247, 0.05);
-        }
+        tbody tr:hover { background: rgba(124, 106, 247, 0.05); }
 
         td {
             padding: 1rem 1.25rem;
@@ -158,15 +151,6 @@
             align-items: center;
         }
 
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-            margin-right: 0.5rem;
-        }
-
         .action-link {
             color: var(--accent);
             text-decoration: none;
@@ -190,14 +174,8 @@
             color: var(--muted);
         }
 
-        .empty-state .icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state p {
-            font-size: 0.9rem;
-        }
+        .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .empty-state p { font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -206,9 +184,10 @@
         <div>
             <h1 class="page-title">
                 Employ<span>ees</span>
-                <span class="badge">{{ count($employees) }}</span>
+                <span class="badge">{{ $employees->total() }}</span>
             </h1>
         </div>
+        <a href="{{ route('employees.create') }}" class="btn btn-primary">
             + Add Employee
         </a>
     </div>
@@ -225,32 +204,33 @@
                     <tr>
                         <th>#</th>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Position</th>
-                        <th>Department</th>
-                        <th>Status</th>
+                        <th>Date of Birth</th>
+                        <th>Civil Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($employees as $employee)
                         <tr>
-                            <td style="color: var(--muted); font-size: 0.8rem;">{{ $loop->iteration }}</td>
+                            <td style="color: var(--muted); font-size: 0.8rem;">
+                                {{ $employees->firstItem() + $loop->index }}
+                            </td>
                             <td>
                                 <div class="name-cell">
                                     <div class="employee-avatar">
-                                        {{ strtoupper(substr($employee->name, 0, 1)) }}
+                                        {{ strtoupper(substr($employee->FirstName, 0, 1)) }}
                                     </div>
-                                    <span class="employee-name">{{ $employee->name }}</span>
+                                    <span class="employee-name">
+                                        {{ $employee->LastName }}, {{ $employee->FirstName }}
+                                        {{ $employee->MiddleName ? strtoupper(substr($employee->MiddleName, 0, 1)).'.' : '' }}
+                                        {{ $employee->NameExtension ?? '' }}
+                                    </span>
                                 </div>
                             </td>
-                            <td style="color: var(--muted);">{{ $employee->email }}</td>
-                            <td>{{ $employee->position ?? '—' }}</td>
-                            <td>{{ $employee->department ?? '—' }}</td>
-                            <td>
-                                <span class="status-dot"></span>
-                                Active
+                            <td style="color: var(--muted);">
+                                {{ $employee->DateOfBirth->format('M d, Y') }}
                             </td>
+                            <td>{{ $employee->CivilStatus }}</td>
                             <td>
                                 <a href="{{ route('employees.show', $employee->id) }}" class="action-link">
                                     View
@@ -260,6 +240,10 @@
                     @endforeach
                 </tbody>
             </table>
+
+            <div style="padding: 1rem 1.25rem; border-top: 1px solid var(--border);">
+                {{ $employees->links() }}
+            </div>
         @endif
     </div>
 

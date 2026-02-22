@@ -9,6 +9,8 @@ class Employees extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'employees';
+
     protected $fillable = [
         'FirstName',
         'LastName',
@@ -20,8 +22,14 @@ class Employees extends Model
         'updated_by',
     ];
 
-    protected $dates = [
-        'DateOfBirth',
-        'deleted_at',
+    protected $casts = [
+        'DateOfBirth' => 'date',
     ];
+
+    public function getFullNameAttribute(): string
+    {
+        $middle = $this->MiddleName ? ' ' . $this->MiddleName[0] . '.' : '';
+        $ext    = $this->NameExtension ? ' ' . $this->NameExtension : '';
+        return "{$this->LastName}, {$this->FirstName}{$middle}{$ext}";
+    }
 }

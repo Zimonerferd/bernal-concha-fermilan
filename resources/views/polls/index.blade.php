@@ -94,6 +94,26 @@
             color: var(--danger);
         }
 
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        .top-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
         .poll-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -197,6 +217,12 @@
         }
 
         .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1.5rem 0;
+        }
     </style>
 </head>
 <body>
@@ -212,6 +238,57 @@
     @if(session('error'))
         <div class="alert alert-error">{{ session('error') }}</div>
     @endif
+
+    {{-- Top Suggestion Section --}}
+    @php
+        $popular = \App\Models\Poll::withCount('votes')
+                    ->orderBy('votes_count', 'desc')
+                    ->take(3)
+                    ->get();
+    @endphp
+
+    @if($popular->count() > 0)
+        <div class="section-label">🏆 Most Voted</div>
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem;">
+            @foreach($popular as $index => $top)
+                @php
+                    $rank = $index + 1;
+                    $medal = $rank === 1 ? '🥇' : ($rank === 2 ? '🥈' : '🥉');
+                    $up = $top->thumbsUp();
+                    $down = $top->thumbsDown();
+                    $total = $top->votes_count;
+                    $upPercent = $total > 0 ? round(($up / $total) * 100) : 0;
+                @endphp
+                <div class="top-card">
+                    <span style="font-size: 1.4rem;">{{ $medal }}</span>
+                    <div style="flex: 1;">
+                        <a href="{{ route('polls.show', $top->id) }}"
+                           style="font-family: 'Syne', sans-serif; font-weight: 700;
+                                  font-size: 0.95rem; color: var(--text); text-decoration: none;
+                                  display: block; margin-bottom: 0.4rem;">
+                            {{ $top->title }}
+                        </a>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 0.78rem; color: var(--success);">👍 {{ $up }}</span>
+                            <span style="font-size: 0.78rem; color: var(--danger);">👎 {{ $down }}</span>
+                            <span style="font-size: 0.78rem; color: var(--muted);">{{ $total }} total votes</span>
+                        </div>
+                        @if($total > 0)
+                            <div style="margin-top: 0.5rem; height: 3px; background: var(--border); border-radius: 99px;">
+                                <div style="height: 100%; width: {{ $upPercent }}%;
+                                            background: linear-gradient(90deg, var(--accent), #a78bfa);
+                                            border-radius: 99px;"></div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <hr class="divider">
+    @endif
+
+    <div class="section-label">🗳️ All Polls</div>
 
     @forelse($polls as $poll)
         <div class="poll-card">

@@ -18,6 +18,8 @@
             --text: #eeeef2;
             --muted: #7a7a90;
             --danger: #f87171;
+            --urgent: #f87171;
+            --suggestion: #4ade80;
         }
 
         body {
@@ -55,7 +57,6 @@
             padding: 1.5rem;
         }
 
-        /* Top row — avatar + name */
         .post-header {
             display: flex;
             align-items: center;
@@ -79,11 +80,7 @@
         }
 
         .user-info { display: flex; flex-direction: column; gap: 2px; }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
+        .user-name { font-weight: 600; font-size: 0.95rem; }
 
         .post-audience {
             display: inline-flex;
@@ -98,7 +95,6 @@
             width: fit-content;
         }
 
-        /* Title input */
         .title-input {
             width: 100%;
             background: transparent;
@@ -115,7 +111,6 @@
 
         .title-input::placeholder { color: #3a3a4a; }
 
-        /* Description textarea */
         .desc-input {
             width: 100%;
             background: transparent;
@@ -131,28 +126,145 @@
 
         .desc-input::placeholder { color: #3a3a4a; }
 
+        .char-count {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        .char-count.warn { color: var(--danger); }
+
         .divider {
             border: none;
             border-top: 1px solid var(--border);
             margin: 1.25rem 0;
         }
 
-        /* Poll badge */
-        .poll-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: var(--accent-glow);
-            border: 1px solid rgba(124, 106, 247, 0.3);
-            color: var(--accent);
-            border-radius: 99px;
-            padding: 0.3rem 0.85rem;
-            font-size: 0.78rem;
+        .field-label {
+            font-size: 0.75rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Category Selector */
+        .category-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 1.25rem;
         }
 
-        /* Thumbs preview */
+        .category-option { position: relative; }
+
+        .category-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .category-option label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--muted);
+            transition: all 0.15s;
+        }
+
+        .category-option label:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .category-option input[type="radio"]:checked + label {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Type Selector */
+        .type-options {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .type-option { flex: 1; position: relative; }
+
+        .type-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .type-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+
+        .type-option label:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .type-option input[type="radio"]:checked + label.urgent {
+            border-color: var(--urgent);
+            background: rgba(248,113,113,0.08);
+        }
+
+        .type-option input[type="radio"]:checked + label.suggestion {
+            border-color: var(--suggestion);
+            background: rgba(74,222,128,0.08);
+        }
+
+        .type-icon { font-size: 1.5rem; }
+
+        .type-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--text);
+        }
+
+        .type-desc {
+            font-size: 0.72rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.82rem;
+            color: var(--danger);
+        }
+
+        .alert-error ul { padding-left: 1.2rem; }
+
         .vote-preview {
             display: flex;
             gap: 0.75rem;
@@ -173,25 +285,7 @@
             justify-content: center;
         }
 
-        /* Error */
-        .alert-error {
-            background: rgba(248, 113, 113, 0.08);
-            border: 1px solid rgba(248, 113, 113, 0.25);
-            border-radius: 10px;
-            padding: 0.85rem 1rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.82rem;
-            color: var(--danger);
-        }
-
-        .alert-error ul { padding-left: 1.2rem; }
-
-        /* Bottom actions */
-        .post-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+        .post-actions { display: flex; align-items: center; gap: 0.75rem; }
 
         .btn-post {
             flex: 1;
@@ -228,15 +322,6 @@
         }
 
         .btn-cancel:hover { color: var(--text); border-color: var(--text); }
-
-        .char-count {
-            font-size: 0.75rem;
-            color: var(--muted);
-            text-align: right;
-            margin-top: 0.25rem;
-        }
-
-        .char-count.warn { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -244,7 +329,6 @@
     <a href="{{ route('polls.index') }}" class="back-link">← Back to Polls</a>
 
     <div class="post-card">
-
         <div class="post-header">
             <div class="user-avatar">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -284,12 +368,49 @@
 
             <hr class="divider">
 
-            <div class="poll-tag">🗳️ Community Poll</div>
-
-            <div class="vote-preview">
-                <div class="vote-chip">👍 Agree</div>
-                <div class="vote-chip">👎 Disagree</div>
+            {{-- Category Selector --}}
+            <div class="field-label">🏷️ Category</div>
+            <div class="category-options">
+                @foreach($categories as $category)
+                    <div class="category-option">
+                        <input type="radio" name="category_id"
+                               id="cat-{{ $category->id }}"
+                               value="{{ $category->id }}"
+                               {{ old('category_id') == $category->id ? 'checked' : '' }}
+                               required>
+                        <label for="cat-{{ $category->id }}">
+                            {{ $category->icon }} {{ $category->name }}
+                        </label>
+                    </div>
+                @endforeach
             </div>
+
+            <hr class="divider">
+
+            {{-- Poll Type Selector --}}
+            <div class="field-label">📋 Poll Type</div>
+            <div class="type-options">
+                <div class="type-option">
+                    <input type="radio" name="type" id="type-urgent" value="urgent"
+                           {{ old('type') === 'urgent' ? 'checked' : '' }} required>
+                    <label for="type-urgent" class="urgent">
+                        <span class="type-icon">🚨</span>
+                        <span class="type-title">Urgent Poll</span>
+                        <span class="type-desc">Needs immediate attention</span>
+                    </label>
+                </div>
+                <div class="type-option">
+                    <input type="radio" name="type" id="type-suggestion" value="suggestion"
+                           {{ old('type') === 'suggestion' ? 'checked' : '' }}>
+                    <label for="type-suggestion" class="suggestion">
+                        <span class="type-icon">💡</span>
+                        <span class="type-title">Community Suggestion</span>
+                        <span class="type-desc">Share ideas with everyone</span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="divider">
 
             <hr class="divider">
 

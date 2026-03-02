@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Poll;
 use App\Models\PollVote;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class PollController extends Controller
@@ -13,15 +14,31 @@ class PollController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $polls = Poll::with('votes')->latest()->paginate(10);
-        return view('polls.index', compact('polls'));
+        $type = $request->query('type');
+        $categoryId = $request->query('category');
+
+        $query = Poll::with('votes', 'user', 'category')->latest();
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $polls = $query->paginate(10);
+        $categories = Category::all();
+
+        return view('polls.index', compact('polls', 'type', 'categories', 'categoryId'));
     }
 
     public function create()
     {
-        return view('polls.create');
+        $categories = Category::all();
+        return view('polls.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -29,6 +46,8 @@ class PollController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'type'        => 'required|in:urgent,suggestion',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
         $validated['user_id'] = auth()->id();
@@ -40,7 +59,7 @@ class PollController extends Controller
 
     public function show(Poll $poll)
     {
-        $poll->load('votes', 'user');
+        $poll->load('votes', 'user', 'category');
         $userVote = $poll->userVote(auth()->id());
         return view('polls.show', compact('poll', 'userVote'));
     }
@@ -50,7 +69,8 @@ class PollController extends Controller
         if ($poll->user_id !== auth()->id()) {
             return redirect()->route('polls.index')->with('error', 'You can only edit your own polls.');
         }
-        return view('polls.edit', compact('poll'));
+        $categories = Category::all();
+        return view('polls.edit', compact('poll', 'categories'));
     }
 
     public function update(Request $request, Poll $poll)
@@ -62,6 +82,8 @@ class PollController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'type'        => 'required|in:urgent,suggestion',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
         $poll->update($validated);
@@ -91,10 +113,8 @@ class PollController extends Controller
 
         if ($existing) {
             if ($existing->vote == $request->vote) {
-                // clicking same vote removes it
                 $existing->delete();
             } else {
-                // switch vote
                 $existing->update(['vote' => $request->vote]);
             }
         } else {

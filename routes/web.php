@@ -15,6 +15,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
     ->name('home');
 
 Route::resource('employees', EmployeeController::class);
+Route::get('polls/top', [PollController::class, 'top']);
 Route::resource('polls', PollController::class)->except(['show']);
 Route::get('polls/{poll}', [PollController::class, 'show'])->name('polls.show');
 Route::post('polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
+Route::get('polls/{poll}/detail', [PollController::class, 'detail'])->name('polls.detail');

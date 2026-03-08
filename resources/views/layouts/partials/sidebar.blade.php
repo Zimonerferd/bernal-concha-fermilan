@@ -105,14 +105,6 @@
       <span class="menu-header-text">Management</span>
     </li>
 
-    {{-- Employees --}}
-    <li class="menu-item {{ Request::is('employees*') ? 'active' : '' }}">
-      <a href="{{ route('employees.index') }}" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-group"></i>
-        <div>Employees</div>
-      </a>
-    </li>
-
     {{-- Polls --}}
     <li class="menu-item {{ Request::is('polls*') ? 'active' : '' }}">
       <a href="{{ route('polls.index') }}" class="menu-link">
